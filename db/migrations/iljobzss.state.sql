@@ -1,0 +1,15 @@
+CREATE TABLE state (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL CHECK(name <> ''),
+  abbr CHAR(2) NOT NULL CHECK(abbr <> ''),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ,
+  UNIQUE(name)
+);
+
+CREATE TRIGGER updated_at BEFORE UPDATE ON state
+  FOR EACH ROW EXECUTE PROCEDURE updated_at();
+
+---
+
+DROP TABLE state;

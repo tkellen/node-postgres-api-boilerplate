@@ -36,7 +36,21 @@ test(`GET ${location}/:id`, t => {
     });
 });
 
-test.todo(`GET ${location}/:id (invalid)`);
+test(`GET ${location}/:id (invalid)`, t => {
+  const badIntRequest = request(app)
+    .get(`${location}/futz`)
+    .expect(500) // Hmmm, really?
+    .then(res => {
+      t.true(res.hasOwnProperty('error'));
+      t.truthy(res.serverError); // this seems odd
+      t.falsy(res.clientError); // as does this
+    });
+  const nonExistentRequest = request(app)
+    .get(`${location}/1093498`)
+    .expect(404);
+  return Promise.all([badIntRequest, nonExistentRequest]);
+});
+
 test.todo(`POST ${location} (single)`);
 test.todo(`POST ${location} (single, invalid)`);
 test.todo(`POST ${location} (multiple)`);

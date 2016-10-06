@@ -25,7 +25,6 @@
     "express-routebuilder": "^2.1.0",
     "is-my-json-valid": "^2.15.0",
     "morgan": "^1.7.0",
-    "pg": "^6.1.0",
     "pg-monitor": "^0.5.11",
     "pg-promise": "^5.3.4",
     "supervisor": "^0.11.0"

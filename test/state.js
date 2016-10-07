@@ -56,8 +56,66 @@ test(`GET ${location}/:id (invalid)`, t => {
   return Promise.all([badIntRequest, nonExistentRequest]);
 });
 
-test.todo(`POST ${location} (single)`);
-test.todo(`POST ${location} (single, invalid)`);
+test(`POST ${location} (single)`, t => {
+  const fakeState = {
+    name: 'FAKE STATE',
+    abbr: 'FS'
+  };
+  return request(app)
+    .post(location)
+    .send({
+      data: fakeState
+    })
+    .expect(201)
+    .then(res => {
+      t.truthy(res.headers.location);
+      t.truthy(res.headers.location.match(`${location}\/[0-9]+`));
+      Object.keys(fakeState).forEach(field => {
+        t.is(res.body.data[field], fakeState[field]);
+      });
+    });
+});
+
+test(`POST ${location} (single, invalid)`, t => {
+  const badStates = {
+    emptyBody: {
+      data: {},
+      field: 'data.body.data' // ??? TODO later
+    },
+    missingName: {
+      data: { abbr: 'FO' },
+      field: 'data.body.data'
+    },
+    duplicateName: {
+      data: { name: 'ALABAMA'},
+      field: 'data.body.data' // This is buggy
+    },
+    invalidNameType: {
+      data: { abbr: 'FO', name: 4 },
+      field: 'data.body.data'
+    }
+  };
+  t.plan(Object.keys(badStates).length * 7);
+  const badRequests = [];
+  Object.keys(badStates).forEach(variationOnBad => {
+    badRequests.push(request(app)
+      .post(location)
+      .send({ data : badStates[variationOnBad].data })
+      .expect(409)
+      .then(res => {
+        t.truthy(res.clientError);
+        t.truthy(res.error);
+        t.falsy(res.body.data);
+        t.true(Array.isArray(res.body.errors));
+        t.true(typeof res.body.errors[0] === 'object');
+        t.is(res.body.errors[0].field, badStates[variationOnBad].field); // TODO review later
+        t.truthy(res.body.errors[0].message);
+      })
+    );
+  });
+  return Promise.all(badRequests);
+});
+
 test.todo(`POST ${location} (multiple)`);
 test.todo(`POST ${location} (multiple, invalid)`);
 test.todo(`PATCH ${location}/:id`);

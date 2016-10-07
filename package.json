@@ -14,11 +14,6 @@
     "seed:create": "careen -C -c db/seeds/careen",
     "test": "PGNAME=test-api-boilerplate mocha --compilers js:babel-register"
   },
-  "ava": {
-    "require": [
-      "babel-register"
-    ]
-  },
   "babel": {
     "presets": [
       "es2015"

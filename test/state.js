@@ -1,10 +1,13 @@
 import test from 'ava';
 import request from 'supertest-as-promised';
+import { up } from './helpers/migrate';
 
 import app from '../src/base/app';
 import { location } from '../src/endpoints/state/routes';
 
-test.todo('before hook handler');
+test.before(t => {
+  up();
+});
 
 test(`GET ${location}`, t => {
   return request(app)

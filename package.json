@@ -7,11 +7,12 @@
     "migrate:up": "careen -A -e -c db/migrations/careen",
     "migrate:down": "careen -R -e -c db/migrations/careen",
     "migrate:create": "careen -C -c db/migrations/careen",
+    "pretest": "dropdb test-api-boilerplate || true && createdb test-api-boilerplate",
     "seed": "careen -c db/seeds/careen",
     "seed:up": "careen -A -e -c db/seeds/careen",
     "seed:down": "careen -R -e -c db/seeds/careen",
     "seed:create": "careen -C -c db/seeds/careen",
-    "test": "ava --verbose"
+    "test": "PGNAME=test-api-boilerplate ava --verbose"
   },
   "ava": {
     "require": [

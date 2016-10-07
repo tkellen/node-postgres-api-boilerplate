@@ -1,12 +1,14 @@
 import test from 'ava';
 import request from 'supertest-as-promised';
 import { up } from './helpers/migrate';
+import fixtures from './helpers/fixtures';
 
 import app from '../src/base/app';
 import { location } from '../src/endpoints/state/routes';
 
 test.before(t => {
   up();
+  return fixtures();
 });
 
 test(`GET ${location}`, t => {

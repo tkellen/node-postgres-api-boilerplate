@@ -35,6 +35,6 @@ export const up = execute.bind(null, '-A -e');
  * TODO: How to derive ID of first migration?
  */
 export const reset = function () {
-  execute('-R -a -e --to=20150823131441');
+  execute('-R -a -e -n 10000');
   execute('-A -e');
 };

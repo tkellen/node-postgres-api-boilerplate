@@ -1,19 +1,24 @@
-/* global describe, it, before */
+/* global describe, it, before, after */
 
 import { expect } from 'chai';
 import request from 'supertest-as-promised';
-import { up } from '../helpers/migrate';
+import * as migrate from '../helpers/migrate';
 import fixtures from '../helpers/fixtures';
 
 import app from '../../src/base/app';
 import { location} from '../../src/endpoints/state/routes';
 
-before(() => {
-  up();
-  return fixtures();
-});
 
 describe (`Endpoint ${location}`, () => {
+  before(() => {
+    migrate.up();
+    return fixtures();
+  });
+
+  after(() => {
+    migrate.reset();
+  });
+
   var firstID;
 
   before (() => {

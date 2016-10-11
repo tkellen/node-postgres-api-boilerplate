@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import pgp from 'pg-promise';
+import pgp from './pgp';
 
 export function load(basePath) {
   return fs.readdirSync(basePath).reduce((result, queryFile) => {
@@ -12,9 +12,18 @@ export function load(basePath) {
 }
 
 export function create (table, fields) {
-  const columns = fields.map(pgp.as.name).join(',');
-  const setters = fields.map(field => `$[${field}]`).join(',');
-  return `INSERT INTO ${pgp.as.name(table)} (${columns}) VALUES (${setters}) RETURNING *`;
+  if (Array.isArray(fields)) { // TODO: deprecate this variant
+    const columns = fields.map(pgp.as.name).join(',');
+    const setters = fields.map(field => `$[${field}]`).join(',');
+    return `INSERT INTO ${pgp.as.name(table)} (${columns}) VALUES (${setters}) RETURNING *`;
+  } else {
+    const insertQuery = pgp.helpers.insert(
+      fields,
+      Object.keys(fields),
+      table
+    );
+    return `${insertQuery} RETURNING *`;
+  }
 }
 
 export function update (table, fields) {

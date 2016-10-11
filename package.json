@@ -12,7 +12,7 @@
     "seed:up": "careen -A -e -c db/seeds/careen",
     "seed:down": "careen -R -e -c db/seeds/careen",
     "seed:create": "careen -C -c db/seeds/careen",
-    "test": "PGNAME=test-api-boilerplate mocha --compilers js:babel-register"
+    "test": "DB_NAME=test-api-boilerplate mocha --compilers js:babel-register"
   },
   "babel": {
     "presets": [

@@ -18,7 +18,7 @@ module.exports = {
   db: {
     host: process.env.PGHOST,
     port: process.env.PGPORT,
-    database: process.env.PGNAME || NAME,
+    database: process.env.PGNAME || process.env.DB_NAME || NAME,
     user: process.env.PGUSER,
     password: process.env.PGPASS
   }

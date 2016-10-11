@@ -2,11 +2,11 @@
 
 import { expect } from 'chai';
 import request from 'supertest-as-promised';
-import { up } from './helpers/migrate';
-import fixtures from './helpers/fixtures';
+import { up } from '../helpers/migrate';
+import fixtures from '../helpers/fixtures';
 
-import app from '../src/base/app';
-import { location} from '../src/endpoints/state/routes';
+import app from '../../src/base/app';
+import { location} from '../../src/endpoints/state/routes';
 
 before(() => {
   up();

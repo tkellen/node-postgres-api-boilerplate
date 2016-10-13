@@ -33,9 +33,8 @@ export function read (table, id) {
       `SELECT * FROM ${tableName} WHERE id = $1`,
       id
     );
-  } else {
-    return `SELECT * FROM ${tableName}`;
   }
+  return `SELECT * FROM ${tableName}`;
 }
 
 /**
@@ -53,14 +52,13 @@ export function create (table, fields) {
     const columns = fields.map(pgp.as.name).join(',');
     const setters = fields.map(field => `$[${field}]`).join(',');
     return `INSERT INTO ${pgp.as.name(table)} (${columns}) VALUES (${setters}) RETURNING *`;
-  } else {
-    const insertQuery = pgp.helpers.insert(
-      fields,
-      Object.keys(fields),
-      table
-    );
-    return `${insertQuery} RETURNING *`;
   }
+  const insertQuery = pgp.helpers.insert(
+    fields,
+    Object.keys(fields),
+    table
+  );
+  return `${insertQuery} RETURNING *`;
 }
 
 /**
@@ -75,14 +73,13 @@ export function update (table, fields) {
       return `${pgp.as.name(field)}=$[${field}]`;
     }).join(', ');
     return `UPDATE ${pgp.as.name(table)} SET ${setters} WHERE id=$[id] RETURNING *`;
-  } else {
-    const updateQuery = pgp.helpers.update(
-      fields,
-      Object.keys(fields),
-      table
-    );
-    return `${updateQuery} WHERE id=$[id] RETURNING *`;
   }
+  const updateQuery = pgp.helpers.update(
+    fields,
+    Object.keys(fields),
+    table
+  );
+  return `${updateQuery} WHERE id=$[id] RETURNING *`;
 }
 
 /**

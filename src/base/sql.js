@@ -20,24 +20,6 @@ export function load (basePath) {
 }
 
 /**
- * Return SQL query to read all or a single record (by ID) from `table`
- * @param {string} table
- * @param [{Number|String}] Optional parseInt-able ID for read-single.
- * @return {string}
- */
-export function read (table, id) {
-  const tableName = new pgp.helpers.TableName(table);
-  const isSingle = (!isNaN(id = parseInt(id, 10)));
-  if (isSingle) {
-    return pgp.as.format(
-      `SELECT * FROM ${tableName} WHERE id = $1`,
-      id
-    );
-  }
-  return `SELECT * FROM ${tableName}`;
-}
-
-/**
  * Return SQL query for creating a new record in `table`.
  * `fields` can be either an Array of column names or an object of values
  * keyed by column name.

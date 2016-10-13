@@ -40,49 +40,6 @@ describe ('base/sql', () => {
     });
   });
 
-  describe ('read', () => {
-    describe ('read many', () => {
-      it ('should return a SELECT query to read all', () => {
-        const selectQuery = sql.read(tableName);
-        expect(selectQuery).to.be.a('string');
-        expect(selectQuery).to.contain('*');
-        expect(selectQuery).to.contain(tableName);
-        expect(selectQuery).to.contain('SELECT');
-      });
-      it ('should return a valid SELECT query', () => {
-        const selectQuery = sql.read(tableName);
-        return db.many(selectQuery).then(result => {
-          expect(result).to.be.an('Array');
-          expect(result.length).to.be.at.least(3);
-          expect(Object.keys(result[0])).to.contain('id', 'name');
-        });
-      });
-    });
-
-    describe ('read one', () => {
-      it ('should return a SELECT query to read a single record', () => {
-        const selectQuery = sql.read(tableName, 1);
-        expect(selectQuery).to.be.a('string');
-        expect(selectQuery).to.contain('1');
-        expect(selectQuery).to.contain('WHERE');
-      });
-      it ('should return a SELECT-all query if ID invalid type', () => {
-        const selectQuery = sql.read(tableName, 'florp');
-        expect(selectQuery).to.be.a('string');
-        expect(selectQuery).not.to.contain('id');
-        expect(selectQuery).not.to.contain('WHERE');
-      });
-      it ('should return a valid SELECT query', () => {
-        const selectQuery = sql.read(tableName, 1);
-        return db.one(selectQuery).then(result => {
-          expect(result).to.be.an('object');
-          expect(result).to.contain.keys('name');
-          expect(result.id).to.equal(1);
-        });
-      });
-    });
-  });
-
   describe ('create', () => {
     it ('should accept an Array of column names', () => {
       const fields = ['name'];

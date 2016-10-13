@@ -1,6 +1,7 @@
 /* global describe, it, before, after */
 
 // TODO fix tableName
+// TODO fix assumptions about columns
 import { expect } from 'chai';
 import * as migrate from '../helpers/migrate';
 import fixtures from '../helpers/fixtures';
@@ -16,6 +17,54 @@ describe ('base/sql', () => {
 
   after(() => {
     migrate.reset();
+  });
+
+  describe ('read', () => {
+    describe ('read many', () => {
+      it ('should return a SELECT query to read all', () => {
+        const tableName = 'state';
+        const selectQuery = sql.read(tableName);
+        expect(selectQuery).to.be.a('string');
+        expect(selectQuery).to.contain('*');
+        expect(selectQuery).to.contain(tableName);
+        expect(selectQuery).to.contain('SELECT');
+      });
+      it ('should return a valid SELECT query', () => {
+        const tableName = 'state';
+        const selectQuery = sql.read(tableName);
+        return db.many(selectQuery).then(result => {
+          expect(result).to.be.an('Array');
+          expect(result.length).to.be.at.least(50);
+          expect(Object.keys(result[0])).to.contain('abbr', 'id', 'name');
+        });
+      });
+    });
+
+    describe ('read one', () => {
+      it ('should return a SELECT query to read a single record', () => {
+        const tableName = 'state';
+        const selectQuery = sql.read(tableName, 1);
+        expect(selectQuery).to.be.a('string');
+        expect(selectQuery).to.contain('1');
+        expect(selectQuery).to.contain('WHERE');
+      });
+      it ('should return a SELECT-all query if ID invalid type', () => {
+        const tableName = 'state';
+        const selectQuery = sql.read(tableName, 'florp');
+        expect(selectQuery).to.be.a('string');
+        expect(selectQuery).not.to.contain('id');
+        expect(selectQuery).not.to.contain('WHERE');
+      });
+      it ('should return a valid SELECT query', () => {
+        const tableName = 'state';
+        const selectQuery = sql.read(tableName, 1);
+        return db.one(selectQuery).then(result => {
+          expect(result).to.be.an('object');
+          expect(result).to.contain.keys('abbr', 'name');
+          expect(result.id).to.equal(1);
+        });
+      });
+    });
   });
 
   describe ('create', () => {
@@ -48,10 +97,16 @@ describe ('base/sql', () => {
   });
 
   describe ('update', () => {
-    //var stateID;
+    // var stateID;
     // before (() => {
-    //   const tableName = pgp.helpers('state';
-    //   const query = 'SELECT * FROM
+    //   const tableName = 'state';
+    //   const newState = {
+    //     abbr: 'DO',
+    //     name: 'DONGLE'
+    //   };
+    //   return sql.create(tableName, newState).then(result => {
+    //     stateID = result.id;
+    //   });
     // });
     it ('should accept an Array of column names', () => {
       const tableName = 'state';

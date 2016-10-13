@@ -3,12 +3,25 @@ import path from 'path';
 
 import pgp from './pgp';
 
-export function load(basePath) {
+export function load (basePath) {
   return fs.readdirSync(basePath).reduce((result, queryFile) => {
     const query = path.basename(queryFile, '.sql');
     result[query] = pgp.QueryFile(path.join(basePath, queryFile));
     return result;
   }, {});
+}
+
+export function read (table, id) {
+  const tableName = new pgp.helpers.TableName(table);
+  const isSingle = (!isNaN(id = parseInt(id, 10)));
+  if (isSingle) {
+    return pgp.as.format(
+      `SELECT * FROM ${tableName} WHERE id = $1`,
+      id
+    );
+  } else {
+    return `SELECT * FROM ${tableName}`;
+  }
 }
 
 export function create (table, fields) {

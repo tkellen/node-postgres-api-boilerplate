@@ -1,22 +1,23 @@
 import db from '../../src/services/db';
-import * as baseSql from '../../src/base/sql';
 
-const data = {
-  state: require('../fixtures/state')
-};
+import pgp from '../../src/base/pgp';
+
+import data from '../fixtures/';
+
+function resetSequence () {
+  return Promise.all(Object.keys(data).map(table => {
+    const tableName = new pgp.helpers.TableName(table);
+    return db.one(`SELECT setval('${table}_id_seq', (SELECT MAX(id) FROM ${tableName}) )`);
+  }));
+}
 
 export default function fixtures () {
-  // Array of promises representing table-insert batch transactions
-  const insertPromises = [];
-  for (const table in data) {
-    // Insert data for each table
-    insertPromises.push(db.tx(t => {
-      return t.batch(data[table].map(insert => {
-        const fields = Object.keys(insert);
-        const sql = baseSql.create(table, fields);
-        return db.one(sql, insert);
-      }));
-    }));
-  }
-  return Promise.all(insertPromises);
+  return Promise.all(Object.keys(data).map(table => {
+    const insertQuery = pgp.helpers.insert(
+      data[table],
+      Object.keys(data[table][0]),
+      table
+    );
+    return db.none(insertQuery);
+  })).then(resetSequence);
 }

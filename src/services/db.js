@@ -1,18 +1,4 @@
-import bluebird from 'bluebird';
-import pgp from 'pg-promise';
-import monitor from 'pg-monitor';
-
+import pgp from '../base/pgp';
 import config from '../../config';
 
-const options = {
-  promiseLib: bluebird
-};
-
-if (config.DEBUG_SQL) {
-  monitor.attach(options);
-  monitor.setTheme('matrix');
-}
-
-const db = pgp(options);
-
-export default db(config.db);
+export default pgp(config.db);

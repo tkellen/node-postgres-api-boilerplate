@@ -27,10 +27,19 @@ export function create (table, fields) {
 }
 
 export function update (table, fields) {
-  const setters = fields.map(field => {
-    return `${pgp.as.name(field)}=$[${field}]`;
-  }).join(', ');
-  return `UPDATE ${pgp.as.name(table)} SET ${setters} WHERE id=$[id] RETURNING *`;
+  if (Array.isArray(fields)) {
+    const setters = fields.map(field => {
+      return `${pgp.as.name(field)}=$[${field}]`;
+    }).join(', ');
+    return `UPDATE ${pgp.as.name(table)} SET ${setters} WHERE id=$[id] RETURNING *`;
+  } else {
+    const updateQuery = pgp.helpers.update(
+      fields,
+      Object.keys(fields),
+      table
+    );
+    return `${updateQuery} RETURNING *`;
+  }
 }
 
 export function destroy (table) {

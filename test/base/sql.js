@@ -141,4 +141,30 @@ describe ('base/sql', () => {
     });
   });
 
+  describe('destroy', () => {
+    var stateID;
+    const tableName = 'state';
+    before (() => {
+      const newState = {
+        abbr: 'KP',
+        name: 'KITCHENPATROL'
+      };
+      const createQuery = sql.create(tableName, newState);
+      return db.one(createQuery).then(result => {
+        stateID = result.id;
+      });
+    });
+    it ('should return a paramaterized DELETE statement', () => {
+      const deleteQuery = sql.destroy(tableName);
+      expect(deleteQuery).to.be.a('string')
+        .and.to.contain('$[id]');
+    });
+    it ('should be a valid DELETE query', () => {
+      const deleteQuery = sql.destroy(tableName);
+      return db.none(deleteQuery, {id : stateID }).then(result => {
+        expect(result).to.equal(null);
+      });
+    });
+  });
+
 });

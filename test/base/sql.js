@@ -9,15 +9,21 @@ import * as sql from '../../src/base/sql';
 import db from '../../src/services/db';
 
 describe ('base/sql', () => {
-  const tableName = 'state';
+  const tableName = 'test_table';
 
   before(() => {
+    const queries = sql.load(path.join(__dirname, '../fixtures/queries'));
     migrate.up();
-    return fixtures();
+    return fixtures().then(() => {
+      return db.query(queries.create_table);
+    });
   });
 
   after(() => {
-    migrate.reset();
+    const queries = sql.load(path.join(__dirname, '../fixtures/queries'));
+    return db.query(queries.drop_table).then(() => {
+      migrate.reset();
+    });
   });
 
   describe('load', () => {
@@ -47,8 +53,8 @@ describe ('base/sql', () => {
         const selectQuery = sql.read(tableName);
         return db.many(selectQuery).then(result => {
           expect(result).to.be.an('Array');
-          expect(result.length).to.be.at.least(50);
-          expect(Object.keys(result[0])).to.contain('abbr', 'id', 'name');
+          expect(result.length).to.be.at.least(3);
+          expect(Object.keys(result[0])).to.contain('id', 'name');
         });
       });
     });
@@ -70,7 +76,7 @@ describe ('base/sql', () => {
         const selectQuery = sql.read(tableName, 1);
         return db.one(selectQuery).then(result => {
           expect(result).to.be.an('object');
-          expect(result).to.contain.keys('abbr', 'name');
+          expect(result).to.contain.keys('name');
           expect(result.id).to.equal(1);
         });
       });
@@ -79,25 +85,25 @@ describe ('base/sql', () => {
 
   describe ('create', () => {
     it ('should accept an Array of column names', () => {
-      const fields = ['abbr', 'name'];
+      const fields = ['name'];
       const insertQuery = sql.create(tableName, fields);
       expect(insertQuery).to.be.a('string');
-      expect(insertQuery).to.contain('$[abbr]');
+      expect(insertQuery).to.contain('$[name]');
       expect(insertQuery).to.contain('RETURNING *');
     });
     it ('should accept an object with columns and values', () => {
-      const data = { 'abbr' : 'FK', 'name' : 'FICKLE' };
+      const data = { 'name' : 'FICKLE' };
       const insertQuery = sql.create(tableName, data);
       expect(insertQuery).to.be.a('string');
       expect(insertQuery).to.contain('FICKLE');
       expect(insertQuery).to.contain('RETURNING *');
     });
     it ('should return a valid INSERT query', () => {
-      const data = { 'abbr' : 'FK', 'name' : 'FICKLE' };
+      const data = { 'name' : 'FICKLE' };
       const insertQuery = sql.create(tableName, data);
       return db.one(insertQuery).then(result => {
         expect(result).to.be.an('object').and.to.contain.keys([
-          'abbr', 'name', 'id', 'created_at'
+          'name', 'id', 'created_at'
         ]);
       });
     });
@@ -107,7 +113,6 @@ describe ('base/sql', () => {
     var stateID;
     before (() => {
       const newState = {
-        abbr: 'DO',
         name: 'DONGLE'
       };
       const createQuery = sql.create(tableName, newState);
@@ -116,14 +121,14 @@ describe ('base/sql', () => {
       });
     });
     it ('should accept an Array of column names', () => {
-      const fields = ['abbr', 'name'];
+      const fields = ['name'];
       const updateQuery = sql.update(tableName, fields);
       expect(updateQuery).to.be.a('string');
-      expect(updateQuery).to.contain('$[abbr]');
+      expect(updateQuery).to.contain('$[name]');
       expect(updateQuery).to.contain('RETURNING *');
     });
     it ('should accept an object with columns and values', () => {
-      const data = { 'abbr' : 'FK', 'name' : 'FICKLE' };
+      const data = { 'name' : 'FICKLE' };
       const updateQuery = sql.update(tableName, data);
       expect(updateQuery).to.be.a('string');
       expect(updateQuery).to.contain('FICKLE');
@@ -131,15 +136,14 @@ describe ('base/sql', () => {
       expect(updateQuery).to.contain('RETURNING *');
     });
     it ('should return a valid UPDATE query', () => {
-      const data = { 'abbr' : 'FO', 'name' : 'FLOP' };
+      const data = { 'name' : 'FLOP' };
       const updateQuery = sql.update(tableName, data);
       return db.one(updateQuery, { id: stateID }).then(result => {
         expect(result).to.be.an('object').and.to.contain.keys([
-          'abbr', 'name', 'id', 'created_at'
+          'name', 'id', 'created_at'
         ]);
         expect(result.id).to.equal(stateID);
         expect(result.name).to.equal('FLOP');
-        expect(result.abbr).to.equal('FO');
       });
     });
   });
@@ -148,7 +152,6 @@ describe ('base/sql', () => {
     var stateID;
     before (() => {
       const newState = {
-        abbr: 'KP',
         name: 'KITCHENPATROL'
       };
       const createQuery = sql.create(tableName, newState);

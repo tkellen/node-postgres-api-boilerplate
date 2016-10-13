@@ -5,6 +5,7 @@ import monitor from 'pg-monitor';
 import config from '../../config';
 
 const options = {
+  capSQL: true,
   promiseLib: bluebird
 };
 

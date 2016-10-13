@@ -51,7 +51,7 @@ export function update (table, fields) {
       Object.keys(fields),
       table
     );
-    return `${updateQuery} RETURNING *`;
+    return `${updateQuery} WHERE id=$[id] RETURNING *`;
   }
 }
 

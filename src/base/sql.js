@@ -49,7 +49,7 @@ export function read (table, id) {
  *                               Complete query string if `fields` is object
  */
 export function create (table, fields) {
-  if (Array.isArray(fields)) { // TODO: deprecate this variant
+  if (Array.isArray(fields)) {
     const columns = fields.map(pgp.as.name).join(',');
     const setters = fields.map(field => `$[${field}]`).join(',');
     return `INSERT INTO ${pgp.as.name(table)} (${columns}) VALUES (${setters}) RETURNING *`;
